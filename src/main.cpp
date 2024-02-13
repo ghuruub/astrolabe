@@ -58,10 +58,11 @@ int main() {
     float currentTime = static_cast<float>(glfwGetTime());
     deltaTime = currentTime - lastFrame;
     lastFrame = currentTime;
-    
+
     glfwPollEvents();
-    
+
     Astrolabe.Update(deltaTime);
+    Astrolabe.Render();
   }
 
   glfwTerminate();
