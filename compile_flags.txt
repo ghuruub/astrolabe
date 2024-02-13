@@ -1,0 +1,11 @@
+-Ilib
+-Ilib/glad/include
+-Ilib/glfw/include
+-llib/glfw/include/GLFW/glfw3native.h
+-llib/glfw/include/GLFW/glfw3.h
+-llib/glad/glad.h
+-Ilib/glm/
+-Ilib/stb/
+-Ilib/imgui
+-Ilib/imgui/backends
+-Iinclude
