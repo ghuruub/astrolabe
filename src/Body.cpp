@@ -1,11 +1,10 @@
 #include "Body.hpp"
-#include "glm/fwd.hpp"
 
-Body::Body(unsigned int mass, glm::vec2 pos, glm::vec2 velocity)
+Body::Body(unsigned int mass, glm::vec2 pos, glm::vec2 velocity, int ID)
     : Mass(mass), Position(pos), Velocity(velocity),
       Acceleration(glm::vec2(0)) {}
 
-void Body::applyForces(Body *body) {
+void Body::ApplyForces(Body *body) {
   glm::vec2 force = body->Position - this->Position;
   force *= (double)(this->Factor * this->Mass * body->Mass /
                     pow(glm::length(this->Position - body->Position), 2));
