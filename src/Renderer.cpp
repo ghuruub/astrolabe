@@ -1,5 +1,5 @@
 #include "Renderer.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
+#include <iostream>
 
 Renderer::Renderer(Shader &shader) {
   this->bindedShader = shader;
@@ -40,13 +40,13 @@ void Renderer::initRenderData() {
   unsigned int VBO;
   float vertices[] = {
     // pos      // tex
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 
+        -0.5f,  0.5f, 0.0f, 1.0f,
+         0.5f, -0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 
 
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f
+        -0.5f,  0.5f, 0.0f, 1.0f,
+         0.5f,  0.5f, 1.0f, 1.0f,
+         0.5f, -0.5f, 1.0f, 0.0f
   };
 
   glGenVertexArrays(1, &quadVAO);

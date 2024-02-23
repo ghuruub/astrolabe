@@ -17,8 +17,8 @@ void GameManager::Init() {
   texture.Generate(width, height, data);
   stbi_image_free(data);
 
-  CreateBody(4, glm::vec2(0.0f, 0.0f), glm::vec2(.5f, .5f), texture,
-              glm::vec2(0.0f, 0.0f));
+  CreateBody(4, glm::vec2(.4f, .4f), glm::vec2(1.0f, 1.0f), texture,
+             glm::vec2(0.0f, 0.0f));
 }
 
 void GameManager::Update(float dt) { ReapplyForces(); }
@@ -41,8 +41,8 @@ void GameManager::ReapplyForces() {
 
 void GameManager::CreateBody(unsigned int mass, glm::vec2 pos, glm::vec2 size,
                              Texture2D texture, glm::vec2 velocity) {
-  Body body(mass, pos, size, texture, velocity);
-  bodies.push_back(&body);
+  Body *body = new Body(mass, pos, size, texture, velocity);
+  bodies.push_back(body);
 }
 
 void GameManager::RemoveBody(Body *body) {
