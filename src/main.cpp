@@ -22,7 +22,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
 const unsigned int SCREEN_WIDTH = 1000;
 const unsigned int SCREEN_HEIGHT = 600;
 
-GameManager Astrolabe;
+GameManager* Astrolabe;
 
 int main() {
   // Setup GLFW window
@@ -56,7 +56,8 @@ int main() {
   float deltaTime = 0.0f;
   float lastFrame = 0.0f;
 
-  Astrolabe.Init();
+    Astrolabe = new GameManager(SCREEN_WIDTH, SCREEN_HEIGHT);
+  Astrolabe->Init();
 
   while (!glfwWindowShouldClose(window)) {
     float currentTime = static_cast<float>(glfwGetTime());
@@ -69,7 +70,7 @@ int main() {
 
     glClearColor(0.03f, 0.01f, 0.08f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    Astrolabe.Render();
+    Astrolabe->Render();
 
     glfwSwapBuffers(window);
   }
@@ -80,8 +81,8 @@ int main() {
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
-  Astrolabe.Width = width;
-  Astrolabe.Height = height;
+  Astrolabe->Width = width;
+  Astrolabe->Height = height;
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action,

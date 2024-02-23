@@ -3,6 +3,9 @@
 #include "stb_image.h"
 #include <iostream>
 
+GameManager::GameManager(unsigned int width, unsigned int height) : Width(width), Height(height) {}
+
+
 void GameManager::Init() {
   Shader shader;
   shader.LoadFromFile("../src/shaders/sprite.vs", "../src/shaders/sprite.fs");
@@ -13,11 +16,11 @@ void GameManager::Init() {
 
   int width, height, nrChannels;
   unsigned char *data =
-      stbi_load("../src/box.jpg", &width, &height, &nrChannels, 0);
+      stbi_load("../src/assets/box.jpg", &width, &height, &nrChannels, 0);
   texture.Generate(width, height, data);
   stbi_image_free(data);
 
-  CreateBody(4, glm::vec2(.4f, .4f), glm::vec2(1.0f, 1.0f), texture,
+  CreateBody(4, glm::vec2(Width / 2.0f, Height / 2.0f), glm::vec2(100.0f, 100.0f), texture,
              glm::vec2(0.0f, 0.0f));
 }
 

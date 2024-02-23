@@ -11,6 +11,8 @@ public:
   std::vector<Body*> bodies;
   Renderer* renderer;
 
+  GameManager(unsigned int width, unsigned int height);
+
   void Init();
   void Update(float dt);
   void Render();
