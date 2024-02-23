@@ -1,18 +1,22 @@
+#ifndef GAME_MANAGER_H
+#define GAME_MANAGER_H
+
 #include <vector>
 #include "Body.hpp"
+#include "Renderer.hpp"
 
 class GameManager {
 public:
-  unsigned int width, height;
+  unsigned int Width, Height;
   std::vector<Body*> bodies;
-
-  ~GameManager();
+  Renderer* renderer;
 
   void Init();
   void Update(float dt);
   void Render();
   void ReapplyForces();
   void ProceedMouseAction();
-  void CreateBody(unsigned int mass, glm::vec2 pos, glm::vec2 velocity);
+  void CreateBody(unsigned int mass, glm::vec2 pos, glm::vec2 size, Texture2D texture, glm::vec2 velocity);
   void RemoveBody(Body* body);
 };
+#endif

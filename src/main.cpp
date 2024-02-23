@@ -13,7 +13,7 @@
 
 #include <iostream>
 
-#include ""
+#include "GameManager.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void key_callback(GLFWwindow *window, int key, int scancode, int action,
@@ -35,7 +35,7 @@ int main() {
 #endif
   glfwWindowHint(GLFW_RESIZABLE, false);
 
-  GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Breakout",
+  GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Astrolabe",
                                         nullptr, nullptr);
   glfwMakeContextCurrent(window);
 
@@ -56,6 +56,8 @@ int main() {
   float deltaTime = 0.0f;
   float lastFrame = 0.0f;
 
+  Astrolabe.Init();
+
   while (!glfwWindowShouldClose(window)) {
     float currentTime = static_cast<float>(glfwGetTime());
     deltaTime = currentTime - lastFrame;
@@ -63,8 +65,13 @@ int main() {
 
     glfwPollEvents();
 
-    Astrolabe.Update(deltaTime);
+    // Astrolabe.Update(deltaTime);
+
+    glClearColor(0.03f, 0.01f, 0.08f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
     Astrolabe.Render();
+
+    glfwSwapBuffers(window);
   }
 
   glfwTerminate();
@@ -73,6 +80,8 @@ int main() {
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
+  Astrolabe.Width = width;
+  Astrolabe.Height = height;
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action,

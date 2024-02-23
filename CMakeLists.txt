@@ -11,8 +11,15 @@ set(IMGUI_DIR lib/imgui/)
 include_directories(lib/imgui/)
 include_directories(lib/imgui/backends/)
 
-add_executable(lightning
+add_executable(astrolabe
   src/main.cpp
+  src/GameManager.cpp
+  src/Body.cpp
+  src/Renderer.cpp
+  src/Texture2D.cpp
+  src/Shader.cpp
+  src/Camera.cpp
+  src/stb_image.cpp
 
   ${IMGUI_DIR}/imgui.cpp
   ${IMGUI_DIR}/imgui_demo.cpp
@@ -24,7 +31,7 @@ add_executable(lightning
 )
 
 include_directories(include/)
-include_directories(lib/stb/)
+#include_directories(lib/stb/)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLLW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -35,23 +42,23 @@ add_subdirectory(lib/glad EXCLUDE_FROM_ALL)
 add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
 
 
-target_link_libraries(lightning
+target_link_libraries(astrolabe
   PRIVATE glfw
   PRIVATE glad
   PRIVATE glm::glm
 )
 
-target_link_libraries(lightning
+target_link_libraries(astrolabe
   PRIVATE "-framework Cocoa"
   PRIVATE "-framework IOKit"
   PRIVATE "-framework CoreVideo"
 )
 
-target_link_directories(lightning
+target_link_directories(astrolabe
     PRIVATE lib/glad/src
 )
 
-target_include_directories(lightning
+target_include_directories(astrolabe
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src
 )
