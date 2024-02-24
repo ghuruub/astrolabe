@@ -22,7 +22,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
 const unsigned int SCREEN_WIDTH = 1000;
 const unsigned int SCREEN_HEIGHT = 600;
 
-GameManager* Astrolabe;
+GameManager *Astrolabe;
 
 int main() {
   // Setup GLFW window
@@ -33,10 +33,10 @@ int main() {
 #ifdef __APPLE__
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-  //glfwWindowHint(GLFW_RESIZABLE, false);
+  // glfwWindowHint(GLFW_RESIZABLE, false);
 
-  GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Astrolabe",
-                                        nullptr, nullptr);
+  GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT,
+                                        "Astrolabe", nullptr, nullptr);
   glfwMakeContextCurrent(window);
 
   // Initialize GLAD
@@ -56,7 +56,7 @@ int main() {
   float deltaTime = 0.0f;
   float lastFrame = 0.0f;
 
-    Astrolabe = new GameManager(SCREEN_WIDTH, SCREEN_HEIGHT);
+  Astrolabe = new GameManager(SCREEN_WIDTH, SCREEN_HEIGHT);
   Astrolabe->Init();
 
   while (!glfwWindowShouldClose(window)) {
@@ -66,7 +66,7 @@ int main() {
 
     glfwPollEvents();
 
-    // Astrolabe.Update(deltaTime);
+    Astrolabe->Update(deltaTime);
 
     glClearColor(0.03f, 0.01f, 0.08f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);

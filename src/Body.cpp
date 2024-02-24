@@ -1,5 +1,4 @@
 #include "Body.hpp"
-#include <iostream>
 
 Body::Body(unsigned int mass, glm::vec2 pos, glm::vec2 size, Texture2D texture,
            glm::vec2 velocity)

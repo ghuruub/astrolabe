@@ -6,6 +6,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat -Wno-c++98-compat-pedantic")
 endif()
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(MACOSX TRUE)
+endif()
+
 set(IMGUI_DIR lib/imgui/)
 
 include_directories(lib/imgui/)
@@ -48,11 +52,13 @@ target_link_libraries(astrolabe
   PRIVATE glm::glm
 )
 
-target_link_libraries(astrolabe
-  PRIVATE "-framework Cocoa"
-  PRIVATE "-framework IOKit"
-  PRIVATE "-framework CoreVideo"
-)
+if (MACOSX)
+  target_link_libraries(astrolabe
+    PRIVATE "-framework Cocoa"
+    PRIVATE "-framework IOKit"
+    PRIVATE "-framework CoreVideo"
+    )
+endif()
 
 target_link_directories(astrolabe
     PRIVATE lib/glad/src

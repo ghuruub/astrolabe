@@ -1,10 +1,9 @@
 #include "GameManager.hpp"
 
 #include "stb_image.h"
-#include <iostream>
 
-GameManager::GameManager(unsigned int width, unsigned int height) : Width(width), Height(height) {}
-
+GameManager::GameManager(unsigned int width, unsigned int height)
+    : Width(width), Height(height) {}
 
 void GameManager::Init() {
   Shader shader;
@@ -20,17 +19,23 @@ void GameManager::Init() {
   texture.Generate(width, height, data);
   stbi_image_free(data);
 
-  CreateBody(4, glm::vec2(Width / 2.0f, Height / 2.0f), glm::vec2(100.0f, 100.0f), texture,
-             glm::vec2(0.0f, 0.0f));
+  CreateBody(50000, glm::vec2(Width / 2.0f - 200.0f, Height / 2.0f),
+             glm::vec2(100.0f, 100.0f), texture, glm::vec2(0.0f, -250.0f));
+  CreateBody(50000, glm::vec2(Width / 2.0f + 200.0f, Height / 2.0f),
+             glm::vec2(100.0f, 100.0f), texture, glm::vec2(0.0f, 250.0f));
+  CreateBody(10, glm::vec2(Width / 2.0f, Height / 2.0f + 100.0f),
+             glm::vec2(50.0f, 50.0f), texture, glm::vec2(20.0f, 0.0f));
 }
 
-void GameManager::Update(float dt) { ReapplyForces(); }
+void GameManager::Update(float dt) {
+  ReapplyForces();
+  MoveBodies(dt);
+}
 
 void GameManager::Render() {
-  // for (Body *body : bodies) {
-  //   renderer->Render(body->Texture, body->Position, body->Size);
-  // }
-  renderer->Render(bodies[0]->Texture, bodies[0]->Position, bodies[0]->Size);
+  for (Body *body : bodies) {
+    renderer->Render(body->Texture, body->Position, body->Size);
+  }
 }
 
 void GameManager::ReapplyForces() {
@@ -39,6 +44,12 @@ void GameManager::ReapplyForces() {
       bodies[i]->ApplyForces(bodies.at(j));
       bodies[j]->ApplyForces(bodies.at(i));
     }
+  }
+}
+
+void GameManager::MoveBodies(float dt) {
+  for (int i = 0; i < bodies.size(); i++) {
+    bodies[i]->Move(dt);
   }
 }
 

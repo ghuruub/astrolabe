@@ -11,16 +11,17 @@ public:
   glm::vec2 Size;
   Texture2D Texture;
 
-  Body(unsigned int mass, glm::vec2 pos, glm::vec2 size, Texture2D texture, glm::vec2 velocity);
+  Body(unsigned int mass, glm::vec2 pos, glm::vec2 size, Texture2D texture,
+       glm::vec2 velocity);
 
   void ApplyForces(Body *body);
   void Move(float dt);
-  void Destroy(Body* body);
+  void Destroy(Body *body);
 
 private:
   glm::vec2 Velocity;
   glm::vec2 Acceleration;
-  const int Factor = 6674; // 6.674e-11
+  const float Factor = 6.674; // 6.674e-11
 };
 
 #endif // BODY_H
