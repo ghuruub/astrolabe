@@ -1,5 +1,4 @@
 #include "Renderer.hpp"
-#include <iostream>
 
 Renderer::Renderer(Shader &shader, Camera *camera) {
   this->bindedShader = shader;
