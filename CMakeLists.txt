@@ -23,7 +23,6 @@ add_executable(astrolabe
   src/Texture2D.cpp
   src/Shader.cpp
   src/Camera.cpp
-  src/stb_image.cpp
 
   ${IMGUI_DIR}/imgui.cpp
   ${IMGUI_DIR}/imgui_demo.cpp
@@ -35,7 +34,7 @@ add_executable(astrolabe
 )
 
 include_directories(include/)
-#include_directories(lib/stb/)
+include_directories(lib/stb/)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLLW_BUILD_TESTS OFF CACHE BOOL "" FORCE)

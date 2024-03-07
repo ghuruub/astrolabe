@@ -11,7 +11,7 @@
 
 class Renderer {
 public:
-  Renderer(Shader &shader);
+  Renderer(Shader &shader, Camera* camera);
   ~Renderer();
 
   void Render(Texture2D &texture, glm::vec2 pos, glm::vec2 size);
@@ -19,7 +19,7 @@ public:
 private:
   unsigned int quadVAO;
   Shader bindedShader;
-  Camera camera;
+  Camera* camera;
 
   void initRenderData();
 };

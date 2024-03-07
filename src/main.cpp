@@ -16,8 +16,8 @@
 #include "GameManager.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void key_callback(GLFWwindow *window, int key, int scancode, int action,
-                  int mode);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void process_input(GLFWwindow *window, float dt);
 
 const unsigned int SCREEN_WIDTH = 1000;
 const unsigned int SCREEN_HEIGHT = 600;
@@ -45,8 +45,8 @@ int main() {
     return -1;
   }
 
-  glfwSetKeyCallback(window, key_callback);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  glfwSetScrollCallback(window, scroll_callback);
 
   // OpenGL configuration
   glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -65,6 +65,7 @@ int main() {
     lastFrame = currentTime;
 
     glfwPollEvents();
+    process_input(window, deltaTime);
 
     Astrolabe->Update(deltaTime);
 
@@ -74,6 +75,8 @@ int main() {
 
     glfwSwapBuffers(window);
   }
+
+  delete Astrolabe;
 
   glfwTerminate();
   return 0;
@@ -85,11 +88,25 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   Astrolabe->Height = height;
 }
 
-void key_callback(GLFWwindow *window, int key, int scancode, int action,
-                  int mode) {
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+void process_input(GLFWwindow *window, float dt) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
 
-  std::cout << "you clicked something\n";
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    Astrolabe->ProcessKeyAction(GLFW_KEY_W, dt);
+  }
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    Astrolabe->ProcessKeyAction(GLFW_KEY_A, dt);
+  }
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    Astrolabe->ProcessKeyAction(GLFW_KEY_S, dt);
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    Astrolabe->ProcessKeyAction(GLFW_KEY_D, dt);
+  }
+}
+
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+  Astrolabe->ProcessScrollAction(yoffset);
 }

@@ -1,15 +1,27 @@
 #include "GameManager.hpp"
+#include "Camera.hpp"
+#include "GLFW/glfw3.h"
 
+#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 GameManager::GameManager(unsigned int width, unsigned int height)
     : Width(width), Height(height) {}
 
+GameManager::~GameManager() {
+  delete camera;
+  delete renderer;
+  for (Body* body : bodies) {
+    delete body;
+  }
+}
+
 void GameManager::Init() {
   Shader shader;
   shader.LoadFromFile("../src/shaders/sprite.vs", "../src/shaders/sprite.fs");
 
-  renderer = new Renderer(shader);
+  camera = new Camera(glm::vec2(0.0f, 0.0f));
+  renderer = new Renderer(shader, camera);
 
   Texture2D texture;
 
@@ -19,12 +31,10 @@ void GameManager::Init() {
   texture.Generate(width, height, data);
   stbi_image_free(data);
 
-  CreateBody(50000, glm::vec2(Width / 2.0f - 200.0f, Height / 2.0f),
-             glm::vec2(100.0f, 100.0f), texture, glm::vec2(0.0f, -250.0f));
-  CreateBody(50000, glm::vec2(Width / 2.0f + 200.0f, Height / 2.0f),
-             glm::vec2(100.0f, 100.0f), texture, glm::vec2(0.0f, 250.0f));
-  CreateBody(10, glm::vec2(Width / 2.0f, Height / 2.0f + 100.0f),
-             glm::vec2(50.0f, 50.0f), texture, glm::vec2(20.0f, 0.0f));
+  CreateBody(40000, glm::vec2(0.0f, 0.0f),
+             100, texture, glm::vec2(0.0f, 0.0f));
+  CreateBody(40, glm::vec2(0.0f, 600.0f),
+             50, texture, glm::vec2(400.0f, 0.0f));
 }
 
 void GameManager::Update(float dt) {
@@ -53,9 +63,9 @@ void GameManager::MoveBodies(float dt) {
   }
 }
 
-void GameManager::CreateBody(unsigned int mass, glm::vec2 pos, glm::vec2 size,
+void GameManager::CreateBody(unsigned int mass, glm::vec2 pos, float radius,
                              Texture2D texture, glm::vec2 velocity) {
-  Body *body = new Body(mass, pos, size, texture, velocity);
+  Body *body = new Body(mass, pos, radius, texture, velocity);
   bodies.push_back(body);
 }
 
@@ -66,4 +76,27 @@ void GameManager::RemoveBody(Body *body) {
       bodies.erase(bodies.begin() + i);
     }
   }
+}
+
+void GameManager::ProcessKeyAction(int keycode, float dt) {
+  bool sprint = false;
+  if (keycode == GLFW_KEY_LEFT_SHIFT) {
+    sprint = true;
+  }
+  if (keycode == GLFW_KEY_W) {
+    camera->ProcessKeyboard(Up, sprint, dt);
+  }
+  if (keycode == GLFW_KEY_A) {
+    camera->ProcessKeyboard(Left, sprint, dt);
+  }
+  if (keycode == GLFW_KEY_S) {
+    camera->ProcessKeyboard(Down, sprint, dt);
+  }
+  if (keycode == GLFW_KEY_D) {
+    camera->ProcessKeyboard(Right, sprint, dt);
+  }
+}
+
+void GameManager::ProcessScrollAction(double yoffset) {
+  camera->ProcessMouseScroll(yoffset);
 }

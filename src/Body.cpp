@@ -1,8 +1,8 @@
 #include "Body.hpp"
 
-Body::Body(unsigned int mass, glm::vec2 pos, glm::vec2 size, Texture2D texture,
+Body::Body(unsigned int mass, glm::vec2 pos, float radius, Texture2D texture,
            glm::vec2 velocity)
-    : Mass(mass), Position(pos), Size(size), Texture(texture),
+    : Mass(mass), Position(pos), Size(glm::vec2(1.0f) * radius), Texture(texture),
       Velocity(velocity), Acceleration(glm::vec2(0)) {}
 
 void Body::ApplyForces(Body *body) {
@@ -13,8 +13,12 @@ void Body::ApplyForces(Body *body) {
 }
 
 void Body::Move(float dt) {
-  Velocity += Acceleration * dt;
-  Position += Velocity * dt;
+  if (Acceleration.length() > 0.001f) {
+    Velocity += Acceleration * dt;
+  }
+  if (Velocity.length() > 0.001f) {
+    Position += Velocity * dt;
+  }
 
   Acceleration = glm::vec2(0);
 }
