@@ -19,8 +19,8 @@ class Camera {
 
     const float MovementSpeed = 1000.0f;
     const float MovementSpeedSprint = 3000.0f;
-    float Zoom = .1f;
-    const float ZoomSpeed = 0.01f;
+    float Zoom = 1.0f;
+    const float ZoomFactor = 0.01f;
 
     Camera(glm::vec2 pos);
     Camera(float posX, float posY);

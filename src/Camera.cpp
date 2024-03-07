@@ -30,6 +30,6 @@ void Camera::ProcessKeyboard(CameraMovement dir, bool sprint, float dt) {
 }
 
 void Camera::ProcessMouseScroll(float yoffset) {
-  Zoom -= yoffset * ZoomSpeed;
+  Zoom -= yoffset * ZoomFactor;
   Zoom = std::clamp(Zoom, ZOOM_MIN, ZOOM_MAX);
 }
