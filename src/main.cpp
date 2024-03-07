@@ -16,8 +16,8 @@
 #include "GameManager.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void mouse_callback(GLFWwindow* window, int button, int action, int mod);
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+void mouse_callback(GLFWwindow *window, int button, int action, int mod);
 void process_input(GLFWwindow *window, float dt);
 
 const unsigned int SCREEN_WIDTH = 1000;
@@ -113,12 +113,8 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
   Astrolabe->ProcessScrollAction(yoffset);
 }
 
-void mouse_callback(GLFWwindow* window, int button, int action, int mod) {
-  if (button == GLFW_MOUSE_BUTTON_LEFT) {
-    if (action == GLFW_PRESS) {
-      // change state
-    } else if (action == GLFW_RELEASE) {
-      // chanbge state
-    } 
-  }
+void mouse_callback(GLFWwindow *window, int button, int action, int mod) {
+  double xpos, ypos;
+  glfwGetCursorPos(window, &xpos, &ypos);
+  Astrolabe->ProcessMouseAction(button, action, mod, xpos, ypos);
 }

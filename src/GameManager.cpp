@@ -2,6 +2,8 @@
 #include "Camera.hpp"
 #include "GLFW/glfw3.h"
 
+#include <iostream>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -11,7 +13,7 @@ GameManager::GameManager(unsigned int width, unsigned int height)
 GameManager::~GameManager() {
   delete camera;
   delete renderer;
-  for (Body* body : bodies) {
+  for (Body *body : bodies) {
     delete body;
   }
 }
@@ -31,10 +33,8 @@ void GameManager::Init() {
   texture.Generate(width, height, data);
   stbi_image_free(data);
 
-  CreateBody(40000, glm::vec2(0.0f, 0.0f),
-             100, texture, glm::vec2(0.0f, 0.0f));
-  CreateBody(40, glm::vec2(0.0f, 600.0f),
-             50, texture, glm::vec2(400.0f, 0.0f));
+  CreateBody(40000, glm::vec2(0.0f, 0.0f), 100, texture, glm::vec2(0.0f, 0.0f));
+  CreateBody(40, glm::vec2(0.0f, 600.0f), 50, texture, glm::vec2(400.0f, 0.0f));
 }
 
 void GameManager::Update(float dt) {
@@ -99,4 +99,11 @@ void GameManager::ProcessKeyAction(int keycode, float dt) {
 
 void GameManager::ProcessScrollAction(double yoffset) {
   camera->ProcessMouseScroll(yoffset);
+}
+
+void GameManager::ProcessMouseAction(int button, int action, int mod,
+                                     double xpos, double ypos) {
+  if (action == GLFW_PRESS) {
+    std::cout << "x: " << xpos << " y: " << ypos << std::endl;
+  }
 }

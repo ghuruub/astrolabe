@@ -24,7 +24,8 @@ public:
   void CreateBody(unsigned int mass, glm::vec2 pos, float radius,
                   Texture2D texture, glm::vec2 velocity);
   void RemoveBody(Body *body);
-  void ProcessMouseAction();
+  void ProcessMouseAction(int buttom, int action, int mod, double xpos,
+                          double ypos);
   void ProcessKeyAction(int keycode, float dt);
   void ProcessScrollAction(double yoffset);
 };
