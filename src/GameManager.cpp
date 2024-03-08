@@ -2,8 +2,6 @@
 #include "Camera.hpp"
 #include "GLFW/glfw3.h"
 
-#include <iostream>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -22,7 +20,7 @@ void GameManager::Init() {
   Shader shader;
   shader.LoadFromFile("../src/shaders/sprite.vs", "../src/shaders/sprite.fs");
 
-  camera = new Camera(glm::vec2(0.0f, 0.0f));
+  camera = new Camera(glm::vec2(0.0f, 0.0f), Width, Height);
   renderer = new Renderer(shader, camera);
 
   Texture2D texture;
@@ -40,6 +38,7 @@ void GameManager::Init() {
 void GameManager::Update(float dt) {
   ReapplyForces();
   MoveBodies(dt);
+  camera->Update(dt);
 }
 
 void GameManager::Render() {
@@ -103,7 +102,22 @@ void GameManager::ProcessScrollAction(double yoffset) {
 
 void GameManager::ProcessMouseAction(int button, int action, int mod,
                                      double xpos, double ypos) {
+  Texture2D texture;
+
+  int width, height, nrChannels;
+  unsigned char *data =
+      stbi_load("../src/assets/box.jpg", &width, &height, &nrChannels, 0);
+  texture.Generate(width, height, data);
+  stbi_image_free(data);
+
+  // From screen to world coordinates
+  glm::vec3 pos = glm::vec3(xpos, -ypos, 0);
+  pos -= glm::vec3(Width / 2.0f, Height / -2.0f, 0);
+  pos.x /= camera->Zoom;
+  pos.y /= camera->Zoom;
+  pos += camera->Position;
+
   if (action == GLFW_PRESS) {
-    std::cout << "x: " << xpos << " y: " << ypos << std::endl;
+    CreateBody(0, pos, 50, texture, glm::vec2(0, 0));
   }
 }

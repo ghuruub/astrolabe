@@ -49,6 +49,7 @@ int main() {
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glfwSetScrollCallback(window, scroll_callback);
+  glfwSetMouseButtonCallback(window, mouse_callback);
 
   // OpenGL configuration
   glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);

@@ -20,7 +20,7 @@ void Renderer::Render(Texture2D &texture, glm::vec2 pos, glm::vec2 size) {
 
   // TODO remove calculation of projection matrix from this method
   glm::mat4 projection =
-      glm::ortho(-500.0f / camera->Zoom, 500.0f / camera->Zoom,
+      glm::ortho(500.0f / camera->Zoom, -500.0f / camera->Zoom,
                  -300.0f / camera->Zoom, 300.0f / camera->Zoom, -1.0f, 1.0f);
 
   bindedShader.SetMatrix4("u_model", model);
