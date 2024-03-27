@@ -22,15 +22,13 @@ public:
   Camera(float posX, float posY, int width, int height);
 
   glm::mat4 GetViewMatrix();
-  void Update(float dt);
   void ProcessKeyboard(CameraMovement direction, bool srint, float dt);
-  void ProcessMouseScroll(float yoffset);
+  void ProcessMouseScroll(float yoffset, float time);
 
 private:
   const float ZOOM_MIN = 0.01f;
   const float ZOOM_MAX = 1.0f;
-  const float ZoomFactor = 0.03f;
-  const float ZoomSpeed = 2.5f;
+  const float ZoomSpeed = .1f;
 
   const float MovementSpeed = 1000.0f;
   const float MovementSpeedSprint = 3000.0f;

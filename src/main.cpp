@@ -15,6 +15,8 @@
 
 #include "GameManager.hpp"
 
+#define DEBUG true
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow *window, int button, int action, int mod);
@@ -56,6 +58,22 @@ int main() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  // ImGui configuration
+#ifdef DEBUG
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    const char* glsl_version = "#version 150";
+    ImGui_ImplOpenGL3_Init(glsl_version);
+#endif
+
   float deltaTime = 0.0f;
   float lastFrame = 0.0f;
 
@@ -67,6 +85,7 @@ int main() {
     deltaTime = currentTime - lastFrame;
     lastFrame = currentTime;
 
+
     glfwPollEvents();
     process_input(window, deltaTime);
 
@@ -76,10 +95,28 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
     Astrolabe->Render();
 
+    if (DEBUG) {
+      ImGui_ImplOpenGL3_NewFrame();
+      ImGui_ImplGlfw_NewFrame();
+      ImGui::NewFrame();
+
+      ImGui::Begin("Debug menu"); 
+      ImGui::Text("FPS: %.3f", io.Framerate);
+      ImGui::End();
+
+      ImGui::Render();
+      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
     glfwSwapBuffers(window);
   }
 
   delete Astrolabe;
+#ifdef DEBUG
+  ImGui_ImplGlfw_Shutdown();
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui::DestroyContext();
+#endif
 
   glfwTerminate();
   return 0;
@@ -111,7 +148,7 @@ void process_input(GLFWwindow *window, float dt) {
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-  Astrolabe->ProcessScrollAction(yoffset);
+  Astrolabe->ProcessScrollAction(yoffset, glfwGetTime());
 }
 
 void mouse_callback(GLFWwindow *window, int button, int action, int mod) {

@@ -1,9 +1,13 @@
 #include "Body.hpp"
+#include <chrono>
 
-Body::Body(unsigned int mass, glm::vec2 pos, float radius, Texture2D texture,
-           glm::vec2 velocity)
-    : Mass(mass), Position(pos), Size(glm::vec2(1.0f) * radius), Texture(texture),
-      Velocity(velocity), Acceleration(glm::vec2(0)) {}
+Body::Body(unsigned int mass, glm::vec2 pos, float radius, glm::vec2 velocity,
+           Shader *shader)
+    : Mass(mass), Position(pos), Size(radius), Velocity(velocity),
+      Acceleration(glm::vec2(0)), Immovable(true), AtmosphereSpeed(3), BodyShader(shader) {
+  Seed = std::chrono::duration_cast<std::chrono::seconds>(
+      std::chrono::system_clock::now().time_since_epoch()).count();
+}
 
 void Body::ApplyForces(Body *body) {
   glm::vec2 force = body->Position - Position;
@@ -13,6 +17,9 @@ void Body::ApplyForces(Body *body) {
 }
 
 void Body::Move(float dt) {
+  if (Immovable) {
+    return;
+  }
   if (Acceleration.length() > 0.001f) {
     Velocity += Acceleration * dt;
   }
@@ -21,4 +28,8 @@ void Body::Move(float dt) {
   }
 
   Acceleration = glm::vec2(0);
+}
+
+bool Body::CheckCollision(Body *body) {
+  return (Position - body->Position).length() < (body->Size + Size);
 }

@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
+#include "Body.hpp"
 #include "Texture2D.hpp"
 #include "Shader.hpp"
 #include "Camera.hpp"
@@ -15,6 +16,7 @@ public:
   ~Renderer();
 
   void Render(Texture2D &texture, glm::vec2 pos, glm::vec2 size);
+  void RenderBody(Body* body);
 
 private:
   unsigned int quadVAO;

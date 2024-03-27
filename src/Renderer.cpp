@@ -1,4 +1,6 @@
 #include "Renderer.hpp"
+#include "Body.hpp"
+#include "GLFW/glfw3.h"
 
 Renderer::Renderer(Shader &shader, Camera *camera) {
   this->bindedShader = shader;
@@ -8,12 +10,12 @@ Renderer::Renderer(Shader &shader, Camera *camera) {
 
 Renderer::~Renderer() { glDeleteVertexArrays(1, &quadVAO); }
 
-void Renderer::Render(Texture2D &texture, glm::vec2 pos, glm::vec2 size) {
-  bindedShader.Use();
+void Renderer::RenderBody(Body* body) {
+  body->BodyShader->Use();
 
   glm::mat4 model = glm::mat4(1.0f);
-  model = glm::translate(model, glm::vec3(pos, 0.0f));
-  model = glm::scale(model, glm::vec3(size, 1.0f));
+  model = glm::translate(model, glm::vec3(body->Position, 0.0f));
+  model = glm::scale(model, glm::vec3(glm::vec2(body->Size * 20), 1.0f));
 
   // TODO remove identity matrix
   glm::mat4 view = camera->GetViewMatrix();
@@ -23,12 +25,14 @@ void Renderer::Render(Texture2D &texture, glm::vec2 pos, glm::vec2 size) {
       glm::ortho(500.0f / camera->Zoom, -500.0f / camera->Zoom,
                  -300.0f / camera->Zoom, 300.0f / camera->Zoom, -1.0f, 1.0f);
 
-  bindedShader.SetMatrix4("u_model", model);
-  bindedShader.SetMatrix4("u_view", view);
-  bindedShader.SetMatrix4("u_projection", projection);
+  body->BodyShader->SetMatrix4("u_model", model);
+  body->BodyShader->SetMatrix4("u_view", view);
+  body->BodyShader->SetMatrix4("u_projection", projection);
 
-  glActiveTexture(GL_TEXTURE0);
-  texture.Bind();
+  body->BodyShader->SetFloat("u_time", glfwGetTime());
+  body->BodyShader->SetInteger("u_seed", body->Seed);
+  body->BodyShader->SetFloat("u_pixelSize", body->Size);
+  body->BodyShader->SetFloat("u_slowedBy", body->AtmosphereSpeed);
 
   glBindVertexArray(quadVAO);
   glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -37,12 +41,15 @@ void Renderer::Render(Texture2D &texture, glm::vec2 pos, glm::vec2 size) {
 
 void Renderer::initRenderData() {
   unsigned int VBO;
-  float vertices[] = {// pos      // tex
-                      -0.5f, 0.5f, 0.0f,  1.0f,  0.5f, -0.5f,
-                      1.0f,  0.0f, -0.5f, -0.5f, 0.0f, 0.0f,
-
-                      -0.5f, 0.5f, 0.0f,  1.0f,  0.5f, 0.5f,
-                      1.0f,  1.0f, 0.5f,  -0.5f, 1.0f, 0.0f};
+  float vertices[] = {
+      // pos
+      -0.5f, 0.5f,  //
+      0.5f,  -0.5f, //
+      -0.5f, -0.5f, //
+      -0.5f, 0.5f,  //
+      0.5f,  0.5f,  //
+      0.5f,  -0.5f  //
+  };
 
   glGenVertexArrays(1, &quadVAO);
   glGenBuffers(1, &VBO);
@@ -51,7 +58,7 @@ void Renderer::initRenderData() {
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
   glBindVertexArray(quadVAO);
-  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);

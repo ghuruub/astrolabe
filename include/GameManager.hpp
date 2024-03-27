@@ -5,6 +5,7 @@
 #include "Body.hpp"
 #include "Renderer.hpp"
 #include "Camera.hpp"
+#include "glm/fwd.hpp"
 
 class GameManager {
 public:
@@ -21,12 +22,17 @@ public:
   void Render();
   void ReapplyForces();
   void MoveBodies(float dt);
-  void CreateBody(unsigned int mass, glm::vec2 pos, float radius,
-                  Texture2D texture, glm::vec2 velocity);
+  Body* CreateBody(unsigned int mass, glm::vec2 pos, float radius,
+                  glm::vec2 velocity);
   void RemoveBody(Body *body);
   void ProcessMouseAction(int buttom, int action, int mod, double xpos,
                           double ypos);
   void ProcessKeyAction(int keycode, float dt);
-  void ProcessScrollAction(double yoffset);
+  void ProcessScrollAction(double yoffset, float time);
+
+private:
+  bool lButtonDown = false;
+  glm::vec3 clickPos;
+  Body* bodyBuffer;
 };
 #endif
