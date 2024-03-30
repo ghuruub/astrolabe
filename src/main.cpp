@@ -4,7 +4,6 @@
 #include <imgui.h>
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
-#include "glm/detail/qualifier.hpp"
 #define GL_SILENCE_DEPRECATION
 
 #include <glm/glm.hpp>
@@ -19,7 +18,7 @@
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-void mouse_callback(GLFWwindow *window, int button, int action, int mod);
+void process_mouse_input(GLFWwindow *window);
 void process_input(GLFWwindow *window, float dt);
 
 const unsigned int SCREEN_WIDTH = 1000;
@@ -51,7 +50,6 @@ int main() {
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glfwSetScrollCallback(window, scroll_callback);
-  glfwSetMouseButtonCallback(window, mouse_callback);
 
   // OpenGL configuration
   glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -59,20 +57,19 @@ int main() {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // ImGui configuration
-#ifdef DEBUG
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
 
-    ImGui::StyleColorsDark();
+  ImGuiIO &io = ImGui::GetIO();
+  (void)io;
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    const char* glsl_version = "#version 150";
-    ImGui_ImplOpenGL3_Init(glsl_version);
-#endif
+  ImGui::StyleColorsDark();
+
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  const char *glsl_version = "#version 150";
+  ImGui_ImplOpenGL3_Init(glsl_version);
 
   float deltaTime = 0.0f;
   float lastFrame = 0.0f;
@@ -85,38 +82,38 @@ int main() {
     deltaTime = currentTime - lastFrame;
     lastFrame = currentTime;
 
-
     glfwPollEvents();
     process_input(window, deltaTime);
+    process_mouse_input(window);
 
-    Astrolabe->Update(deltaTime);
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
 
     glClearColor(0.03f, 0.01f, 0.08f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    Astrolabe->Update(deltaTime);
     Astrolabe->Render();
+    Astrolabe->DrawUI();
 
     if (DEBUG) {
-      ImGui_ImplOpenGL3_NewFrame();
-      ImGui_ImplGlfw_NewFrame();
-      ImGui::NewFrame();
-
-      ImGui::Begin("Debug menu"); 
+      ImGui::Begin("Debug menu");
       ImGui::Text("FPS: %.3f", io.Framerate);
       ImGui::End();
-
-      ImGui::Render();
-      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
   }
 
   delete Astrolabe;
-#ifdef DEBUG
+
   ImGui_ImplGlfw_Shutdown();
   ImGui_ImplOpenGL3_Shutdown();
   ImGui::DestroyContext();
-#endif
 
   glfwTerminate();
   return 0;
@@ -133,17 +130,21 @@ void process_input(GLFWwindow *window, float dt) {
     glfwSetWindowShouldClose(window, true);
   }
 
+  bool shift = false;
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+    shift = true;
+  }
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    Astrolabe->ProcessKeyAction(GLFW_KEY_W, dt);
+    Astrolabe->ProcessKeyAction(GLFW_KEY_W, dt, shift);
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    Astrolabe->ProcessKeyAction(GLFW_KEY_A, dt);
+    Astrolabe->ProcessKeyAction(GLFW_KEY_A, dt, shift);
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    Astrolabe->ProcessKeyAction(GLFW_KEY_S, dt);
+    Astrolabe->ProcessKeyAction(GLFW_KEY_S, dt, shift);
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    Astrolabe->ProcessKeyAction(GLFW_KEY_D, dt);
+    Astrolabe->ProcessKeyAction(GLFW_KEY_D, dt, shift);
   }
 }
 
@@ -151,8 +152,21 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
   Astrolabe->ProcessScrollAction(yoffset, glfwGetTime());
 }
 
-void mouse_callback(GLFWwindow *window, int button, int action, int mod) {
-  double xpos, ypos;
-  glfwGetCursorPos(window, &xpos, &ypos);
-  Astrolabe->ProcessMouseAction(button, action, mod, xpos, ypos);
+void process_mouse_input(GLFWwindow *window) {
+  ImGuiIO &io = ImGui::GetIO();
+
+  if (!io.WantCaptureMouse) {
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
+      Astrolabe->ProcessMouseAction(
+          GLFW_MOUSE_BUTTON_LEFT,
+          glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT), xpos, ypos);
+    }
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)) {
+      Astrolabe->ProcessMouseAction(
+          GLFW_MOUSE_BUTTON_RIGHT,
+          glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT), xpos, ypos);
+    }
+  }
 }

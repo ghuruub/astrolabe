@@ -10,17 +10,15 @@ Renderer::Renderer(Shader &shader, Camera *camera) {
 
 Renderer::~Renderer() { glDeleteVertexArrays(1, &quadVAO); }
 
-void Renderer::RenderBody(Body* body) {
+void Renderer::RenderBody(Body *body) {
   body->BodyShader->Use();
 
   glm::mat4 model = glm::mat4(1.0f);
   model = glm::translate(model, glm::vec3(body->Position, 0.0f));
   model = glm::scale(model, glm::vec3(glm::vec2(body->Size * 20), 1.0f));
 
-  // TODO remove identity matrix
   glm::mat4 view = camera->GetViewMatrix();
 
-  // TODO remove calculation of projection matrix from this method
   glm::mat4 projection =
       glm::ortho(500.0f / camera->Zoom, -500.0f / camera->Zoom,
                  -300.0f / camera->Zoom, 300.0f / camera->Zoom, -1.0f, 1.0f);
@@ -33,6 +31,13 @@ void Renderer::RenderBody(Body* body) {
   body->BodyShader->SetInteger("u_seed", body->Seed);
   body->BodyShader->SetFloat("u_pixelSize", body->Size);
   body->BodyShader->SetFloat("u_slowedBy", body->AtmosphereSpeed);
+
+  body->BodyShader->SetVector3f("u_offset", body->Pallete[0]);
+  body->BodyShader->SetVector3f("u_amplitude", body->Pallete[1]);
+  body->BodyShader->SetVector3f("u_frequency", body->Pallete[2]);
+  body->BodyShader->SetVector3f("u_phase", body->Pallete[3]);
+
+  body->BodyShader->SetFloat("u_alpha", body->Alpha);
 
   glBindVertexArray(quadVAO);
   glDrawArrays(GL_TRIANGLES, 0, 6);

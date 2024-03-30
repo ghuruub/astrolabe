@@ -1,6 +1,8 @@
 #ifndef GAME_MANAGER_H
 #define GAME_MANAGER_H
 
+#include <array>
+#include <stack>
 #include <vector>
 #include "Body.hpp"
 #include "Renderer.hpp"
@@ -11,6 +13,7 @@ class GameManager {
 public:
   unsigned int Width, Height;
   std::vector<Body *> bodies;
+  bool DrawTrails = false;
   Renderer *renderer;
   Camera *camera;
 
@@ -20,19 +23,29 @@ public:
   void Init();
   void Update(float dt);
   void Render();
+  void DrawUI();
   void ReapplyForces();
+  void ReapplyForcesTo(Body* body);
   void MoveBodies(float dt);
   Body* CreateBody(unsigned int mass, glm::vec2 pos, float radius,
                   glm::vec2 velocity);
+  void BodyCreationEffects();
   void RemoveBody(Body *body);
-  void ProcessMouseAction(int buttom, int action, int mod, double xpos,
+  void ProcessMouseAction(int buttom, int action, double xpos,
                           double ypos);
-  void ProcessKeyAction(int keycode, float dt);
+  void ProcessKeyAction(int keycod, float dt, bool shift = false);
   void ProcessScrollAction(double yoffset, float time);
 
 private:
-  bool lButtonDown = false;
-  glm::vec3 clickPos;
+  bool bodyCreation = false;
   Body* bodyBuffer;
+  int shadowsAmout = 3;
+  glm::vec3 leftClickPos;
+  glm::vec3 rightClickPos;
+  float bodySpeedSensitivity = 1;
+
+  // ui
+  bool uiMassive = false;
+  std::stack<std::array<glm::vec3, 4>> previousColor;
 };
 #endif

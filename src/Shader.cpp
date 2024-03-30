@@ -5,6 +5,9 @@
 #include <iostream>
 #include <sstream>
 
+Shader::Shader(const char *vShaderFile, const char *fShaderFile) {
+  LoadFromFile(vShaderFile, fShaderFile);
+}
 Shader &Shader::Use()
 {
     glUseProgram(ID);

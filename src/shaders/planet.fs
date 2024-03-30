@@ -14,13 +14,15 @@ uniform vec3 u_amplitude;
 uniform vec3 u_frequency;
 uniform vec3 u_phase;
 
+uniform float u_alpha;
+
 vec3 offset = vec3(0.193, 0.287, 0.335);
 vec3 amplitude = vec3(0.759, 0.782, 0.844);
 vec3 frequency = vec3(0.968, 0.018, 0.242);
 vec3 phase = vec3(1.274, 4.403, 3.709);
 
 vec3 gradient(float t) {
-  return offset + amplitude * cos(6.28318 * (frequency * t + phase));
+  return u_offset + u_amplitude * cos(6.28318 * (u_frequency * t + u_phase));
 }
 
 float fade(float t) {
@@ -100,7 +102,7 @@ float noise(vec3 pos) {
   float upper_mix = mix2d(d000, d010, d100, d110, fpos);
   float lower_mix = mix2d(d001, d011, d101, d111, fpos);
 
-  return mix(upper_mix, lower_mix, fade(fpos.z));
+  return (mix(upper_mix, lower_mix, fade(fpos.z)));
 }
 
 void main() {
@@ -108,7 +110,7 @@ void main() {
   vec3 pos = FragPos * 2;
 
   //float noiseSize = 7;
-  float noiseSize = u_pixelSize * 7 / 10;
+  float noiseSize = u_pixelSize * u_pixelSize / 100 + 5;
 
   // pixelize coordinates
   pos *= u_pixelSize;
@@ -123,8 +125,8 @@ void main() {
     FragColor = vec4(0.0);
   } else {
     // genetate noise 
-    float col = fade(noise(vec3(vec2(pos / 2 + 0.5) * noiseSize, u_time / u_slowedBy)) / 2.0 + 0.5);
+    float col = (noise(vec3(vec2(pos / 2 + 0.5) * noiseSize, u_time / u_slowedBy)) / 2.0 + 0.5);
 
-    FragColor = vec4(gradient(col), 1.0);
+    FragColor = vec4(gradient(col), u_alpha);
   }
 }

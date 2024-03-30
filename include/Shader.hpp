@@ -12,6 +12,7 @@ public:
   unsigned int ID;
 
   Shader() {}
+  Shader(const char *vShaderFile, const char *fShaderFile);
 
   Shader &Use();
 

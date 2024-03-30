@@ -28,7 +28,7 @@ public:
 private:
   const float ZOOM_MIN = 0.01f;
   const float ZOOM_MAX = 1.0f;
-  const float ZoomSpeed = .1f;
+  const float ZoomSpeed = .05f;
 
   const float MovementSpeed = 1000.0f;
   const float MovementSpeedSprint = 3000.0f;
