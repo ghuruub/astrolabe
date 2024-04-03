@@ -26,7 +26,7 @@ public:
   void ProcessMouseScroll(float yoffset, float time);
 
 private:
-  const float ZOOM_MIN = 0.01f;
+  const float ZOOM_MIN = 0.1f;
   const float ZOOM_MAX = 1.0f;
   const float ZoomSpeed = .05f;
 

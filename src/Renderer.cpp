@@ -5,13 +5,21 @@
 Renderer::Renderer(Shader &shader, Camera *camera) {
   this->bindedShader = shader;
   this->camera = camera;
+  
+  Width = camera->ScreenWidth;
+  Height = camera->ScreeHeight;
+
+  trailShader.LoadFromFile("../src/shaders/sprite.vs",
+                           "../src/shaders/trail.fs");
   initRenderData();
 }
 
 Renderer::~Renderer() { glDeleteVertexArrays(1, &quadVAO); }
 
 void Renderer::RenderBody(Body *body) {
-  body->BodyShader->Use();
+  RenderTrail(body);
+
+  bindedShader.Use();
 
   glm::mat4 model = glm::mat4(1.0f);
   model = glm::translate(model, glm::vec3(body->Position, 0.0f));
@@ -20,28 +28,59 @@ void Renderer::RenderBody(Body *body) {
   glm::mat4 view = camera->GetViewMatrix();
 
   glm::mat4 projection =
-      glm::ortho(500.0f / camera->Zoom, -500.0f / camera->Zoom,
-                 -300.0f / camera->Zoom, 300.0f / camera->Zoom, -1.0f, 1.0f);
+      glm::ortho((Width / 2.0f) / camera->Zoom, -(Width / 2.0f) / camera->Zoom,
+                 -(Height / 2.0f) / camera->Zoom, (Height / 2.0f) / camera->Zoom, -1.0f, 1.0f);
 
-  body->BodyShader->SetMatrix4("u_model", model);
-  body->BodyShader->SetMatrix4("u_view", view);
-  body->BodyShader->SetMatrix4("u_projection", projection);
+  bindedShader.SetMatrix4("u_model", model);
+  bindedShader.SetMatrix4("u_view", view);
+  bindedShader.SetMatrix4("u_projection", projection);
 
-  body->BodyShader->SetFloat("u_time", glfwGetTime());
-  body->BodyShader->SetInteger("u_seed", body->Seed);
-  body->BodyShader->SetFloat("u_pixelSize", body->Size);
-  body->BodyShader->SetFloat("u_slowedBy", body->AtmosphereSpeed);
+  bindedShader.SetFloat("u_time", glfwGetTime());
+  bindedShader.SetInteger("u_seed", body->Seed);
+  bindedShader.SetFloat("u_pixelSize", body->Size);
+  bindedShader.SetFloat("u_slowedBy", body->AtmosphereSpeed);
 
-  body->BodyShader->SetVector3f("u_offset", body->Pallete[0]);
-  body->BodyShader->SetVector3f("u_amplitude", body->Pallete[1]);
-  body->BodyShader->SetVector3f("u_frequency", body->Pallete[2]);
-  body->BodyShader->SetVector3f("u_phase", body->Pallete[3]);
+  bindedShader.SetVector3f("u_offset", body->Pallete[0]);
+  bindedShader.SetVector3f("u_amplitude", body->Pallete[1]);
+  bindedShader.SetVector3f("u_frequency", body->Pallete[2]);
+  bindedShader.SetVector3f("u_phase", body->Pallete[3]);
 
-  body->BodyShader->SetFloat("u_alpha", body->Alpha);
+  bindedShader.SetFloat("u_alpha", body->Alpha);
 
   glBindVertexArray(quadVAO);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
+}
+
+void Renderer::RenderTrail(Body *body) {
+  if (body->Immovable) {
+    return;
+  }
+
+  trailShader.Use();
+
+  glm::mat4 model = glm::mat4(1.0f);
+
+  glm::mat4 view = camera->GetViewMatrix();
+
+  glm::mat4 projection =
+      glm::ortho((Width / 2.0f) / camera->Zoom, -(Width / 2.0f) / camera->Zoom,
+                 -(Height / 2.0f) / camera->Zoom, (Height / 2.0f) / camera->Zoom, -1.0f, 1.0f);
+
+  trailShader.SetMatrix4("u_view", view);
+  trailShader.SetMatrix4("u_projection", projection);
+
+  for (int i = body->PositionHistory.size() - 1; i >= 0; i--) {
+    model = glm::translate(model, glm::vec3(body->PositionHistory[i], 0.0f));
+    model = glm::scale(model, glm::vec3(glm::vec2(15), 1.0f));
+    trailShader.SetMatrix4("u_model", model);
+
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+
+    model = glm::mat4(1.0f);
+  }
 }
 
 void Renderer::initRenderData() {

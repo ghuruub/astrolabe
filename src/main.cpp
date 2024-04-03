@@ -21,8 +21,8 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void process_mouse_input(GLFWwindow *window);
 void process_input(GLFWwindow *window, float dt);
 
-const unsigned int SCREEN_WIDTH = 1000;
-const unsigned int SCREEN_HEIGHT = 600;
+const unsigned int SCREEN_WIDTH = 1280;
+const unsigned int SCREEN_HEIGHT = 720;
 
 GameManager *Astrolabe;
 
@@ -36,7 +36,8 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
 #endif
-  // glfwWindowHint(GLFW_RESIZABLE, false);
+
+  glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
   GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT,
                                         "Astrolabe", nullptr, nullptr);
@@ -73,14 +74,17 @@ int main() {
 
   float deltaTime = 0.0f;
   float lastFrame = 0.0f;
+  float timeConsideringSpeed = 0.0f;
+  float timeSpeed = 1.0f;
 
   Astrolabe = new GameManager(SCREEN_WIDTH, SCREEN_HEIGHT);
   Astrolabe->Init();
 
   while (!glfwWindowShouldClose(window)) {
     float currentTime = static_cast<float>(glfwGetTime());
-    deltaTime = currentTime - lastFrame;
+    deltaTime = timeSpeed * (currentTime - lastFrame);
     lastFrame = currentTime;
+    timeConsideringSpeed += deltaTime;
 
     glfwPollEvents();
     process_input(window, deltaTime);
@@ -90,7 +94,7 @@ int main() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    glClearColor(0.03f, 0.01f, 0.08f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     Astrolabe->Update(deltaTime);
@@ -99,7 +103,13 @@ int main() {
 
     if (DEBUG) {
       ImGui::Begin("Debug menu");
+      ImGui::Text("Absolute Time: %.2f", glfwGetTime());
+      ImGui::Text("Time: %.2f", timeConsideringSpeed);
       ImGui::Text("FPS: %.3f", io.Framerate);
+      ImGui::SliderFloat("Time Speed", &timeSpeed, 0.5f, 10.0f);
+      if (ImGui::Button("Reset time speed")) {
+        timeSpeed = 1.0f;
+      }
       ImGui::End();
     }
 
@@ -121,8 +131,7 @@ int main() {
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
-  Astrolabe->Width = width;
-  Astrolabe->Height = height;
+  Astrolabe->ChangeResolution(width, height);
 }
 
 void process_input(GLFWwindow *window, float dt) {

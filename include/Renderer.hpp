@@ -6,21 +6,26 @@
 
 
 #include "Body.hpp"
-#include "Texture2D.hpp"
 #include "Shader.hpp"
 #include "Camera.hpp"
 
 class Renderer {
 public:
+  int Width;
+  int Height;
+
+
   Renderer(Shader &shader, Camera* camera);
   ~Renderer();
 
-  void Render(Texture2D &texture, glm::vec2 pos, glm::vec2 size);
+  void Render(glm::vec2 pos, glm::vec2 size);
   void RenderBody(Body* body);
+  void RenderTrail(Body* body);
 
 private:
   unsigned int quadVAO;
   Shader bindedShader;
+  Shader trailShader;
   Camera* camera;
 
   void initRenderData();

@@ -20,7 +20,6 @@ add_executable(astrolabe
   src/GameManager.cpp
   src/Body.cpp
   src/Renderer.cpp
-  src/Texture2D.cpp
   src/Shader.cpp
   src/Camera.cpp
 

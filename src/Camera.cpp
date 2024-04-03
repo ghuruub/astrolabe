@@ -1,7 +1,6 @@
 #include "Camera.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include <algorithm>
-#include <iostream>
 
 Camera::Camera(glm::vec2 pos, int width, int height)
     : Position(glm::vec3(pos, 0.0f)), ScreenWidth(width), ScreeHeight(height) {}

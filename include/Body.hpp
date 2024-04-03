@@ -1,7 +1,6 @@
 #ifndef BODY_H
 #define BODY_H
 
-#include "Shader.hpp"
 #include <array>
 #include <vector>
 #include <glm/glm.hpp>
@@ -16,28 +15,31 @@ public:
   glm::vec2 Velocity;
 
   std::vector<glm::vec2> PositionHistory;
+  int HistoryCapacity = 10;
+  float HistoryPeriod = 0.3;
 
-  Shader *BodyShader;
   int Seed;
   int AtmosphereSpeed;
   std::array<glm::vec3, 4> Pallete;
   float Alpha = 1;
 
-  Body(unsigned int mass, glm::vec2 pos, float radius, glm::vec2 velocity,
-       Shader *shader);
+  Body(unsigned int mass, glm::vec2 pos, float radius, glm::vec2 velocity);
   Body(const Body &body);
 
   void ApplyForces(Body *body);
   void Move(float dt);
   void Destroy(Body *body);
   bool CheckCollision(Body *body);
+  void Collide(Body *body);
 
   static std::array<glm::vec3, 4> GeneratePallete();
 
 private:
   glm::vec2 Acceleration;
-  const float Factor = 4; // 66.74; // 6.674e-11
+  const float Factor = 4;
   bool shadow = false;
+
+  float previousPositionTime = 0;
 };
 
 #endif // BODY_H

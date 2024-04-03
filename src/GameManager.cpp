@@ -2,11 +2,9 @@
 #include "Body.hpp"
 #include "Camera.hpp"
 #include "GLFW/glfw3.h"
+#include "Shader.hpp"
 #include "glm/fwd.hpp"
 #include "imgui.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 GameManager::GameManager(unsigned int width, unsigned int height)
     : Width(width), Height(height) {}
@@ -21,13 +19,26 @@ GameManager::~GameManager() {
 
 void GameManager::Init() {
   Shader shader;
+  shader.LoadFromFile("../src/shaders/sprite.vs", "../src/shaders/planet.fs");
   camera = new Camera(glm::vec2(0.0f, 0.0f), Width, Height);
   renderer = new Renderer(shader, camera);
+}
+
+void GameManager::ChangeResolution(int width, int height) {
+  Width = width;
+  Height = height;
+
+  camera->ScreenWidth = width;
+  camera->ScreeHeight = height;
+
+  renderer->Width = width;
+  renderer->Height = height;
 }
 
 void GameManager::Update(float dt) {
   ReapplyForces();
   MoveBodies(dt);
+  CheckCollisions();
 }
 
 void GameManager::Render() {
@@ -68,12 +79,29 @@ void GameManager::MoveBodies(float dt) {
   }
 }
 
+void GameManager::CheckCollisions() {
+  for (int i = 0; i < bodies.size(); i++) {
+    if (bodies[i]->Immovable) {
+      continue;
+    }
+    for (int j = i + 1; j < bodies.size(); j++) {
+      if (bodies[j]->Immovable) {
+        continue;
+      }
+      if (bodies[i]->CheckCollision(bodies[j])) {
+        bodies[i]->Collide(bodies[j]);
+        bodies[j]->Collide(bodies[i]);
+      }
+    }
+  }
+}
+
 Body *GameManager::CreateBody(unsigned int mass, glm::vec2 pos, float radius,
                               glm::vec2 velocity) {
   Shader *shader = new Shader();
   shader->LoadFromFile("../src/shaders/sprite.vs", "../src/shaders/planet.fs");
 
-  Body *body = new Body(mass, pos, radius, velocity, shader);
+  Body *body = new Body(mass, pos, radius, velocity);
   return body;
 }
 
@@ -198,24 +226,34 @@ void GameManager::DrawUI() {
 
 void GameManager::BodyCreationEffects() {
   if (!bodyCreation || bodyBuffer->Velocity == glm::vec2(0)) {
+    shadows.clear();
     return;
   }
-  std::vector<Body> shadows;
   for (int i = 0; i < shadowsAmout * 5; i++) {
-    if (i == 0) {
-      shadows.push_back(Body(*bodyBuffer));
+    if (shadows.size() < shadowsAmout * 5) {
+      if (i == 0) {
+        shadows.push_back(Body(*bodyBuffer));
+      } else {
+        shadows.push_back(Body(shadows[i - 1]));
+      }
     } else {
-      shadows.push_back(Body(shadows[i - 1]));
+      if (i == 0) {
+        shadows[i].Velocity = bodyBuffer->Velocity;
+        shadows[i].Position = bodyBuffer->Position;
+      } else {
+        shadows[i].Velocity = shadows[i - 1].Velocity;
+        shadows[i].Position = shadows[i - 1].Position;
+      }
+      shadows[i].Pallete = bodyBuffer->Pallete;
     }
+
     if (i % 5 == 0) {
       shadows[i].Alpha = 1 - 0.3f * i / (shadowsAmout * 5);
     } else {
       shadows[i].Alpha = 0;
     }
     ReapplyForcesTo(&shadows[i]);
-    if (i != 0) {
-      shadows[i].Position = shadows[i - 1].Position;
-    }
+
     shadows[i].Move(0.1f);
     renderer->RenderBody(&shadows[i]);
   }

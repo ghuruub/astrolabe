@@ -21,12 +21,14 @@ public:
   ~GameManager();
 
   void Init();
-  void Update(float dt);
+  void ChangeResolution(int width, int height);
   void Render();
   void DrawUI();
+  void Update(float dt);
   void ReapplyForces();
   void ReapplyForcesTo(Body* body);
   void MoveBodies(float dt);
+  void CheckCollisions();
   Body* CreateBody(unsigned int mass, glm::vec2 pos, float radius,
                   glm::vec2 velocity);
   void BodyCreationEffects();
@@ -40,6 +42,7 @@ private:
   bool bodyCreation = false;
   Body* bodyBuffer;
   int shadowsAmout = 3;
+  std::vector<Body> shadows;
   glm::vec3 leftClickPos;
   glm::vec3 rightClickPos;
   float bodySpeedSensitivity = 1;
